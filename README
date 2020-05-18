@@ -1,0 +1,48 @@
+### What I Did
+1. I started off by implementing a basic shell that would basically take in some input, parse it into an array, then fork off a child and have the child run execvpe on the array that contained the command and arguments. I worked on the builtin functions like pwd, cd, and exit here as well and this work can be found in exec.c.
+2. Afterwards I begun work on job control support which was probably the hardest part of the assignment. I implemented a linked list that kept track of the root and tail nodes and adding a background job to this linked list would cost O(1). Removing jobs would be O(n) regardless of the data structure because it has to go through the data structure and call waitpid on each node to determine if the background job has finished running and if it can be removed. 
+3. Once the linked list was in place, I started implementing the commands needed for it such as jobs, fg, bg, and kill. Jobs will print out all the nodes and if it finds one that has an exit status then it takes it out and prints it out separately stating that the job has finished. 
+4. I also put in signal handlers for ^C and ^Z that will stop or abort the foreground process which is also tracked by jobs.c
+5. Once I finished job control I worked on redirection support. I basically just went throught he commands arguments array, checked if >, 2>, or < was in any of the arguments and redirected stdout, stdin and stderr accordingly using dup, dup2, and open. 
+6. Variables/echo support came next and it basically involved finding if there was an argument that started with a $ in the command argument array and replacing it with the corresponding variable.Then once all the $ variables were replaced I just iterated through the array and printed out each argument.
+7. Next up I did non-interactive support which basically involved opening the argument containing the script file name and then reading it line by line and executing each line. It took me a while to understand how to get the file name but thankfully I received some help from piazza to look into argv when smash was called by a script.
+8. Next up I did debugging which basically involved adding short definitions for "RUNNING" and "ENDED" prompts and calling them in the proper places.
+9. Then I made my test scripts which follow a very similar format compared to the other hws but instead it runs a bunch of commands inside the smash shell. 
+10. After the test scripts, I decided to do the globbing extra credit and it basically involved modifying my parse.c so that it would expand *.[EXTENSION] into all the files in the command arguments array.
+11. Finally I decided to write this README to let you know how I approached the work for this assignment.
+
+### files that are included in my submission
+baseHeaders.h
+^ contains all the basic headers that are needed for this assignment, gets added to all the other header files
+debug.c debug.h
+^ contains the debug functions necessary for when the program is run with the -d argument
+exec.c exec.h
+^ contains the functions necessary to execute foreground, background, and builtin jobs
+jobs.c jobs.h
+^ contains the linked list that keeps track of all background jobs and functions that manipulate and use this linked list
+parse.c parse.h
+^ functions that parse the input provided by the user
+redirect.c redirect.h
+^ functions that redirect stdin, stdout, stderr to the appropriate files
+smash.c smash.h
+^ the main shell program
+test1.sh test2.sh test3.sh
+^ tests that I have provided for the graders
+testRun1.sh testRun2.sh testRun3.sh
+^ called by test#.sh and will be executed inside smash
+allTests.sh
+^ runs test1.sh test2.sh test3.sh in that order
+forTesting directory
+^ contains files necessary for testing and where files will be placed during test execution
+
+### using the makefile
+make = will create the ./smash executable which you can run interactively
+make clean = will cleanup the whole directory
+make allTests = will run all the tests that I have made for the graders
+make test1 / make test2 / make test3 = will run each test file manually
+
+### EXTRA CREDIT
+I only did the file globbing extra credit but I did not wrap my Extra Credit code so it can just be run in a normal compilation of the smash.
+
+### extra notes
+1. All the test files will print to stdout with the results.
